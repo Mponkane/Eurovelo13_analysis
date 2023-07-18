@@ -11,7 +11,7 @@ st.set_page_config(page_title="Eurovelo cycling analysis",
 st.markdown("""
  <div style="display: flex; align-items: center;">
    <h2 style="margin: 0;">Eurovelo 13 - service level analysis</h2>
-   <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/data/welcome_cyclist.png" width="150" height="150">
+   <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
  </div>
             
  This web app was developed as part of the Tourism Development Project for Sparsely Populated Areas to showcase service levels of different Eurovelo 13 segments.  
