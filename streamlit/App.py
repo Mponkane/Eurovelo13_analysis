@@ -2,8 +2,6 @@
 import streamlit as st
 
 
-## ___________________ APP _______________________ 
-
 st.set_page_config(page_title="Eurovelo cycling analysis", 
                    page_icon="🌍", 
                    layout="centered", 
@@ -20,6 +18,6 @@ st.markdown("""
  
  ###### 👈 ***From the sidebar you can explore different components of the service level analysis***
  
- *Streamlit app made by Matti Pönkänen | FLOU ltd (2023). Licensed under CC-BY.*
+ *App made by Matti Pönkänen | FLOU ltd (2023). Licensed under CC-BY.*
  
  """, unsafe_allow_html=True)
