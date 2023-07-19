@@ -5,6 +5,7 @@ import plotly.express as px
 import folium
 from streamlit_folium import folium_static
 from functions.markdown_functions import responsive_to_window_width
+from functions.styling_functions import style_route, style_buffer
 
 ## ___________________ service level analysis_______________________ 
 
@@ -21,9 +22,15 @@ st.markdown("""
             """)
 
 merged_opportunities = gpd.read_file('streamlit/data/palvelut.shp')
+eurovelo = gpd.read_file('streamlit/data/eurovelo.shp')
+buffer = gpd.read_file('streamlit/data/buffer.shp')
+buffer_merged = gpd.read_file('streamlit/data/buffer_merged.shp')
 
 # Reproject the data to Web Mercator
 merged_opportunities = merged_opportunities.to_crs('EPSG:4326')
+eurovelo = eurovelo.to_crs('EPSG:4326')
+buffer = buffer.to_crs('EPSG:4326')
+buffer_merged = buffer_merged.to_crs('EPSG:4326')
 
 opportunity_types = merged_opportunities['type'].unique()
 selected_types = st.multiselect('Valitse palvelut ja virkistyskohteet:', opportunity_types)
@@ -44,35 +51,45 @@ else:
     # Get the unique segment values
     segments = np.unique(segments)
 
-    # Add an "All" option to the segments list so that data can be looked at nationally
-    segments = np.insert(segments, 0, 'All')
+    # Add an "EV13" option to the segments list so that data can be looked at nationEV13y
+    segments = np.insert(segments, 0, 'EV13')
 
     # Create a selectbox for different segments
     selected_segment = st.selectbox('Valitse reittiosuus:', segments)
 
-    # Filter the data based on the selected municipality or All
-    if selected_segment == 'All':
+    # Reprojecting for length properties
+    eurovelo_tm35fin = eurovelo.to_crs('EPSG:3067')
+
+    # Filter the data based on the selected municipality or EV13
+    if selected_segment == 'EV13':
         filtered_data = merged_opportunities
+        segment_length = eurovelo_tm35fin.geometry.length.sum() / 1000
         zoom_level = 5
         point_size = 120
     else:
         # Split the values in the 'segmentti' column on the comma character
         segments = merged_opportunities['segmentti'].str.split(', ')
+        segment_length = eurovelo_tm35fin[eurovelo_tm35fin['name'] == selected_segment].geometry.length.sum() / 1000
         
         # Create a boolean mask indicating which rows contain the selected segment
         mask = segments.apply(lambda x: selected_segment in x)
         
         # Filter the data using the boolean mask
         filtered_data = merged_opportunities[mask]
-        zoom_level = 10
+        zoom_level = 8
         point_size = 80
 
     # Filter data by selected opportunity types
     filtered_data = filtered_data[filtered_data['type'].isin(selected_types)]
 
+    # Add a checkbox to show or hide the buffer
+    col1, col2 = st.columns([1, 1])
+    with col2:
+        show_buffer = st.checkbox('Näytä 10 km etäisyysvyöhyke reitistä', value=False)
+
     #----- CREATING A CHART -----
 
-    # Summarize the number of each opportunity type for the selected municipality or all
+    # Summarize the number of each opportunity type for the selected municipality or EV13
     opportunities = filtered_data.groupby(['type', 'color']).size().reset_index(name='count')
 
     # Rename the opportunity column
@@ -90,7 +107,7 @@ else:
 
     # Update the layout of the chart
     fig.update_layout(
-     title=f'Number of opportunities in {selected_segment}',
+     title=f'Palvelut segmentillä: {selected_segment} ({segment_length:.0f} km)',
      title_font_size=24,
      xaxis_title=None,
      yaxis_title=None,
@@ -109,7 +126,12 @@ else:
         centroid = filtered_data.geometry.unary_union.centroid
 
         # Create a new Folium map centered on the centroid of the selected segment's geometry
-        m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles = "cartodbpositron")
+        m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles = 'cartodbpositron')
+
+        # Add the buffer and route to the map
+        if show_buffer:
+            style_buffer(m, selected_segment, buffer, buffer_merged)
+        style_route(m, selected_segment, eurovelo)
 
         # Define a function for adding a point layer to the map
         def add_point_layer(gdf, color):
@@ -124,8 +146,6 @@ else:
                     fill_color=color,
                     fill_opacity=1
                 ).add_child(folium.Tooltip(row['name'])).add_to(m)
-
-
 
         # Add a point layer to the map for each opportunity type
         for opportunity_type in opportunity_types:
