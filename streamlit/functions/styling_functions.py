@@ -4,14 +4,14 @@ from streamlit_folium import folium_static
 
 def style_buffer(m, selected_segment, buffer, buffer_merged):
     # Add the Eurovelo route to the map
-    if selected_segment == 'EV13':
+    if selected_segment == 'Koko reitti':
         # Add the merged buffer to the map
         folium.GeoJson(
             buffer_merged,
             style_function=lambda x: {
-                'color': '#034716',
+                'color': '#fa9b28',
                 'weight': 1,
-                'fillColor': '#034716',
+                'fillColor': '#fa9b28',
                 'fillOpacity': 0.1
             }
         ).add_to(m)
@@ -24,16 +24,16 @@ def style_buffer(m, selected_segment, buffer, buffer_merged):
         folium.GeoJson(
             buffer_selected,
             style_function=lambda x: {
-                'color': '#034716',
+                'color': '#fa9b28',
                 'weight': 1,
-                'fillColor': '#034716',
+                'fillColor': '#fa9b28',
                 'fillOpacity': 0.2
             }
         ).add_to(m)
 
 def style_route(m, selected_segment, eurovelo):
     # Add the Eurovelo route to the map
-    if selected_segment == 'EV13':
+    if selected_segment == 'Koko reitti':
 
         # Add a white border around the entire route
         folium.GeoJson(
@@ -57,7 +57,7 @@ def style_route(m, selected_segment, eurovelo):
         folium.GeoJson(
             eurovelo,
             style_function=lambda x: {
-                'color': 'grey',
+                'color': '#003346',
                 'weight': 3,
                 'dashArray': '5, 5'
             }
