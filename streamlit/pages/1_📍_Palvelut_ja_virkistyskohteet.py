@@ -5,7 +5,6 @@ import numpy as np
 import plotly.express as px
 import folium
 from streamlit_folium import folium_static
-from streamlit.components.v1 import html
 from functions.markdown_functions import responsive_to_window_width
 from functions.styling_functions import style_route, style_buffer
 
@@ -17,9 +16,9 @@ st.set_page_config(page_title="service level analysis",
 
 
 st.markdown("""
-            ### 📍**Eurovelo 13 reitin palvelutaso**
+            ## **Eurovelo 13 -reitin palvelutaso**
 
-            *Kuvaus ja datalähteet tähän*
+            Tässä osiossa voit tarkastella Eurovelo 13 -reitin varrelle sijoittuvia palveluita. 10 km puskuri..
             
             """)
 
@@ -56,7 +55,7 @@ else:
     # Add an "Koko reitti" option to the segments list so that data can be looked at nationKoko reittiy
     segments = np.insert(segments, 0, 'Koko reitti')
     # Create a selectbox for different segments
-    selected_segment = st.selectbox('Valitse reittiosuus:', segments)
+    selected_segment = st.selectbox('Valitse reittisegmentti:', segments)
     # Reprojecting for length properties
     eurovelo_tm35fin = eurovelo.to_crs('EPSG:3067')
     # Calculate the length of the entire route in kilometers
