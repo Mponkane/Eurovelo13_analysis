@@ -22,7 +22,7 @@ st.markdown("""
             
             """)
 
-merged_opportunities = gpd.read_file('streamlit/data/palvelut.shp')
+merged_opportunities = gpd.read_file('streamlit/data/palvelut_ja_virkistyskohteet.geojson')
 eurovelo = gpd.read_file('streamlit/data/eurovelo.shp')
 buffer = gpd.read_file('streamlit/data/buffer.shp')
 buffer_merged = gpd.read_file('streamlit/data/buffer_merged.shp')
@@ -33,15 +33,17 @@ eurovelo = eurovelo.to_crs('EPSG:4326')
 buffer = buffer.to_crs('EPSG:4326')
 buffer_merged = buffer_merged.to_crs('EPSG:4326')
 
-opportunity_types = merged_opportunities['type'].unique()
+# Hide kansallispuistot and VAMA from the first select box
+opportunity_types = [x for x in merged_opportunities['type'].unique() if x not in ['Kansallispuistot', 'Valtakunnallisesti arvokkaat maisema-alueet']]
 selected_types = st.multiselect('Valitse palvelut ja virkistyskohteet:', opportunity_types)
+landscape_types = ['Kansallispuistot', 'Valtakunnallisesti arvokkaat maisema-alueet']
+selected_landscape_types = st.multiselect('Valitse maisema-arvo:', landscape_types)
 
-if not selected_types:
-    st.warning('Valitse ainakin yksi palvelu tai virkistyskohde')
+if not selected_types and not selected_landscape_types:
+    st.warning('Valitse ainakin yksi palvelu, virkistyskohde tai maisema-arvo')
 
 else:
-    # Get unique values from the 'segment' column
-    segments = merged_opportunities['segmentti'].unique()
+#------ Setting up the selectbox for different segments-----
     # Split the values in the 'segmentti' column on the comma character
     segments = merged_opportunities['segmentti'].str.split(', ')
     # Flatten the list of lists into a single list of segment values
@@ -56,6 +58,8 @@ else:
     segments = np.insert(segments, 0, 'Koko reitti')
     # Create a selectbox for different segments
     selected_segment = st.selectbox('Valitse reittisegmentti:', segments)
+#-------------------------------------------------------------
+
     # Reprojecting for length properties
     eurovelo_tm35fin = eurovelo.to_crs('EPSG:3067')
     # Calculate the length of the entire route in kilometers
@@ -63,7 +67,7 @@ else:
     # Calculate the average number of opportunities per kilometer for each Palvelun tyyppi
     avg_opportunities = merged_opportunities.groupby('type').size() / route_length
 
-    # Filter the data based on the selected municipality or Koko reitti
+    # Filter the data based on the selected segment or Koko reitti
     if selected_segment == 'Koko reitti':
         filtered_data = merged_opportunities
         segment_length = eurovelo_tm35fin.geometry.length.sum() / 1000
@@ -82,21 +86,22 @@ else:
         # Calculate the average number of opportunities per kilometer for each Palvelun tyyppi
         avg_opportunities_segment = filtered_data.groupby('type').size() / segment_length
         
-        # Create a boolean mask indicating which rows contain the selected segment
-        mask = segments.apply(lambda x: selected_segment in x)
-        
         # Filter the data using the boolean mask
         filtered_data = merged_opportunities[mask]
         zoom_level = 8
         point_size = 80
 
-    # Filter data by selected Palvelun tyyppis
-    filtered_data = filtered_data[filtered_data['type'].isin(selected_types)]
+    # Filter data by selected Palvelun tyyppi
+    filtered_data = filtered_data[filtered_data['type'].isin(selected_types + selected_landscape_types)]
 
     # Add a checkbox to show or hide the buffer
     col1, col2 = st.columns([1, 1])
     with col1:
-        show_comparison = st.checkbox('Vertaa palvelujen määrää per kilometri', value=False)
+        # Add a checkbox to show or hide the comparison chart
+        if selected_segment != 'Koko reitti':
+            show_comparison = st.checkbox('Vertaa palvelujen määrää per kilometri', value=False)
+        else:
+            show_comparison = False
     with col2:
         show_buffer = st.checkbox('Näytä 10 km etäisyysvyöhyke reitistä', value=False)
 
@@ -142,14 +147,14 @@ else:
         data = pd.DataFrame({
             'Palvelun tyyppi': np.tile(selected_opportunity_types, 2),
             'Segmentti': np.repeat([selected_segment, 'Koko reitti'], len(selected_opportunity_types)),
-            'Keskimääräinen palveluiden lukumäärä kilometrillä': np.concatenate([avg_opportunities_segment.values, avg_opportunities.values])
+            'Palveluiden määrä kilometriä kohden': np.concatenate([avg_opportunities_segment.values, avg_opportunities.values])
         })
 
         # Create a bar chart
         fig2 = px.bar(
             data,
             x='Palvelun tyyppi',
-            y='Keskimääräinen palveluiden lukumäärä kilometrillä',
+            y='Palveluiden määrä kilometriä kohden',
             color='Segmentti',
             barmode='group',
             color_discrete_map={selected_segment: '#fa9b28', 'Koko reitti': '#003346'}
@@ -157,7 +162,7 @@ else:
 
         # Update the layout of the chart
         fig2.update_layout(
-            title=f'Keskimääräinen palveluiden lukumäärä <br>kilometriä kohden',
+            title=f'Palveluiden määrä kilometriä kohden',
             title_font_size=24,
             xaxis_title=None,
             yaxis_title=None,
@@ -188,6 +193,21 @@ else:
             style_buffer(m, selected_segment, buffer, buffer_merged)
         style_route(m, selected_segment, eurovelo)
 
+        # Function for adding polygons
+        def add_polygon_layer(gdf, color):
+            # Add GeoJson polygons to the map
+            for _, row in gdf.iterrows():
+                folium.GeoJson(
+                    row.geometry,
+                    style_function=lambda x: {
+                        'color': row['stroke'],
+                        'weight': 1,
+                        'fillColor': row['color'],
+                        'fillOpacity': 0.5
+                    }
+                ).add_child(folium.Tooltip(row['name'])).add_to(m)
+
+
         # Define a function for adding a point layer to the map
         def add_point_layer(gdf, color):
             # Add CircleMarkers to the map
@@ -202,18 +222,32 @@ else:
                     fill_opacity=1
                 ).add_child(folium.Tooltip(row['name'])).add_to(m)
 
-        # Add a point layer to the map for each Palvelun tyyppi
+        # Add a polygon layer to the map for each landscape type
+        for landscape_type in landscape_types:
+            # Filter the data to only include rows for this landscape type
+            data = filtered_data[filtered_data['type'] == landscape_type]
+            
+            # Check if the data DataFrame is empty
+            if not data.empty:
+                # Get the fill color for this landscape type from the first row of data
+                color = data.iloc[0]['color']
+                
+                # Add a polygon layer to the map for this landscape type
+                add_polygon_layer(data, color)
+
+        # Add a point layer to the map for each opportunity type
         for opportunity_type in opportunity_types:
-            # Filter the data to only include rows for this Palvelun tyyppi
+            # Filter the data to only include rows for this opportunity type
             data = filtered_data[filtered_data['type'] == opportunity_type]
             
             # Check if the data DataFrame is empty
             if not data.empty:
-                # Get the color for this Palvelun tyyppi from the first row of data
+                # Get the color for this opportunity type from the first row of data
                 color = data.iloc[0]['color']
                 
-                # Add a point layer to the map for this Palvelun tyyppi
+                # Add a point layer to the map for this opportunity type
                 add_point_layer(data, color)
+
 
 
         col1, col2 = st.columns([1, 1])
