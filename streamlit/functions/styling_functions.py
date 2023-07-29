@@ -83,3 +83,4 @@ def style_route(m, selected_segment, eurovelo):
                 'weight': 4
             }
         ).add_to(m)
+

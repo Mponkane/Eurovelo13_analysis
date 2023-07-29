@@ -73,7 +73,6 @@ else:
         segment_length = eurovelo_tm35fin.geometry.length.sum() / 1000
         avg_opportunities_segment = avg_opportunities
         zoom_level = 5
-        point_size = 120
     else:
         # Split the values in the 'segmentti' column on the comma character
         segments = merged_opportunities['segmentti'].str.split(', ')
@@ -89,7 +88,6 @@ else:
         # Filter the data using the boolean mask
         filtered_data = merged_opportunities[mask]
         zoom_level = 8
-        point_size = 80
 
     # Filter data by selected Palvelun tyyppi
     filtered_data = filtered_data[filtered_data['type'].isin(selected_types + selected_landscape_types)]
@@ -182,7 +180,7 @@ else:
         with col1:
             st.warning("Ei palveluita segmentillä, valitse toinen yhteysväli")
     else:  
-        # Calculate the centroid of the selected municipality's geometry so that map gets to the location of the points
+        # Calculate the centroid of the selected segment geometry so that map gets to the location of the points
         centroid = filtered_data.geometry.unary_union.centroid
 
         # Create a new Folium map centered on the centroid of the selected segment's geometry
