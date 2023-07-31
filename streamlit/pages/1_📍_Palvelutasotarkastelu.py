@@ -10,17 +10,22 @@ from functions.styling_functions import style_route, style_buffer
 
 ## ___________________ service level analysis_______________________ 
 
-st.set_page_config(page_title="service level analysis", 
+st.set_page_config(page_title="Palvelutasotarkastelu", 
                    layout="wide", 
                    initial_sidebar_state="expanded")
 
-
 st.markdown("""
-            ## **Eurovelo 13 -reitin palvelutaso**
+ <div style="display: flex; align-items: center;">
+   <h2 style="margin: 0;">Eurovelo 13 -reitin palvelutaso</h2>
+   <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
+ </div>   
+Tässä osiossa voit tarkastella Eurovelo 13 -reitin varrelle sijoittuvia palveluita. Reittiä voi tarkastella joko kokonaisuutena tai suunniteltujen 
+päiväsegmenttien mukaisesti. Valitse ensin valikosta tarkasteltavat palvelut, virkistyskohteet ja maisemalliset arvot, jonka jälkeen pystyt
+tarkastelemaan miten ne jakaantuvat eri päiväsegmenteittäin. Päiväsegmenttien palvelutasoa on myös mahdollista verrata koko reitin keskiarvoon, 
+jolloin voidaan vertailla reittiosuuksien laatua palveluiden näkökulmasta. Menetelmäkuvauksen löydät alapuolelta.
+<br><br>
+ """, unsafe_allow_html=True)
 
-            Tässä osiossa voit tarkastella Eurovelo 13 -reitin varrelle sijoittuvia palveluita. 10 km puskuri..
-            
-            """)
 
 merged_opportunities = gpd.read_file('streamlit/data/palvelut_ja_virkistyskohteet.geojson')
 eurovelo = gpd.read_file('streamlit/data/eurovelo.shp')
@@ -97,7 +102,7 @@ else:
     with col1:
         # Add a checkbox to show or hide the comparison chart
         if selected_segment != 'Koko reitti':
-            show_comparison = st.checkbox('Vertaa palvelujen määrää per kilometri', value=False)
+            show_comparison = st.checkbox('Vertaa palvelujen määrää koko reitin keskiarvoon (palvelut per kilometri)', value=False)
         else:
             show_comparison = False
     with col2:
@@ -257,4 +262,22 @@ else:
         else:
             with col2:
                 folium_static(m)
+
+st.markdown("""
+
+
+#### Menetelmäkuvaus
+
+Analyysin paikkatietoaineistot on kerätty erilaisista tietolähteistä, jotka löydät verkkosivun kohdasta <b>4. Datalähteet</b>. 
+Palvelutasoanalyysi on tuotettu, jakamalla Eurovelon GPX jälki 31 päiväsegmenttiin. Päiväsegmentit kuvaavat reittiosuuksia, miten reittiä suositellaan pyöräiltävän.
+Analyysissä, jokaiselle päiväsegmentille on ajettu 10 km puskurivyöhyke, joiden sisälle jäävät palvelut on kiinnitetty arvottamaan eri päiväsegmenttejä. 
+Data on alustettu erilaisilla paikkatieto-ohjelmistoilla, jonka jälkeen se on viety Pythonin Streamlit kirjaston avulla verkkoon, interaktiiviseen muotoon. 
+<br><br>Scripti jolla tämä sivu on tuotettu näet githubista: https://github.com/Mponkane/Eurovelo13_analysis/blob/main/streamlit/pages/1_📍_Palvelut_ja_virkistyskohteet.py         
+
+<br>
+
+ <br>
+ <em>App made by Matti Pönkänen | FLOU ltd (2023). Licensed under CC0-1.0.</em>
+ 
+ """, unsafe_allow_html=True)
 

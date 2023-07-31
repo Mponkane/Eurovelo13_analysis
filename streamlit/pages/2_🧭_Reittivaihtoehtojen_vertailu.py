@@ -9,17 +9,23 @@ from functions.markdown_functions import responsive_to_window_width
 
 ## ___________________ service level analysis_______________________ 
 
-st.set_page_config(page_title="service level analysis", 
+st.set_page_config(page_title="Reittivaihtoehtojen vertailu", 
                    layout="wide", 
                    initial_sidebar_state="expanded")
 
-
 st.markdown("""
-            ## **Eurovelo 13 vaihtoehtoisten reittiosuuksien vertailu**
+ <div style="display: flex; align-items: center;">
+   <h2 style="margin: 0;">Eurovelo 13 – Vaihtoehtoisten reittiosuuksien vertailu</h2>
+   <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
+ </div>   
+Osana harvaan asuttujen seutujen matkailuhanketta, tarkasteltiin myös Eurovelo 13 -reitin vaihtoehtoisia reittilinjauksia palveluiden näkökulmasta.
+Nykyinen Eurovelo 13 -reitin linjaus kulkee Sallasta Savukoskelle, jonka kautta se suuntautuu Pyhälle. Osana tätä hanketta, tarkasteltiin myös vaihtoehtoista
+reittiä Kemijärven kautta. Reittivaihtoehdot ovat pituudeltaan samaa luokkaa (150 km), mutta uusi reittilinjaus on palvelutarjonnaltaan runsaampi. 
+Alla olevasta laatikosta pystyt rajaamaan erilaiset palvelut, jotka piirretään näkyviin kuvaajaan sekä karttaan. 
+Kartan harmaat pisteet ovat palveluita, jotka sijoittuvat molempien reittien segmenteille.
+<br><br>
+ """, unsafe_allow_html=True)
 
-            Osana harvaan asuttujen seutujen matkailuhanketta tarkasteltiin myös Eurovelo 13 -reitin vaihtoehtoisia reittilinjauksia palveluiden näkökulmasta.
-
-            """)
 
 
 opportunities_VE0 = gpd.read_file('streamlit/data/services_VE0.shp')
@@ -34,7 +40,6 @@ eurovelo = eurovelo.to_crs('EPSG:4326')
 ve0 = ve0.to_crs('EPSG:4326')
 ve1 = ve1.to_crs('EPSG:4326')
 
-# Combine the two data frames into a single data frame
 opportunities_VE0['route'] = 'Nykyinen reitti (Salla-Savukoski-Pyhä)'
 opportunities_VE1['route'] = 'Vaihtoehtoinen reitti (Salla-Kemijärvi-Pyhä)'
 combined_data = pd.concat([opportunities_VE0, opportunities_VE1])
@@ -50,7 +55,6 @@ else:
     summary_data = filtered_data.groupby(['type', 'route']).size().reset_index(name='count')
     summary_data = summary_data.rename(columns={'type': 'Palvelun tyyppi'})
 
-    # Create a grouped bar chart
     fig = px.bar(
         summary_data,
         x='Palvelun tyyppi',
@@ -61,7 +65,6 @@ else:
         color_discrete_sequence=['#003346', '#fa9b28']
     )
 
-    # Update the layout of the chart
     fig.update_layout(
         title=f'Palveluiden vertailu nykyisellä ja vaihtoehtoisella reittilinjauksella',
         title_font_size=24,
@@ -81,10 +84,8 @@ else:
     centroid = filtered_data.geometry.unary_union.centroid
     zoom_level = 8
 
-    # Create a new Folium map centered on the centroid of the selected segment's geometry
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles='cartodbpositron')
 
-    # Update the 'add_point_layer' function to use the 'in_both_routes' column to determine the fill color of the CircleMarkers
     def add_point_layer(gdf, color):
         # Add CircleMarkers to the map
         for _, row in gdf.iterrows():
@@ -150,9 +151,7 @@ else:
         tooltip=folium.GeoJsonTooltip(fields=['name'])
     ).add_to(m)
 
-    # Add a point layer to the map for each route
     for route, color in zip(['Nykyinen reitti (Salla-Savukoski-Pyhä)', 'Vaihtoehtoinen reitti (Salla-Kemijärvi-Pyhä)'], ['#003346', '#fa9b28']):
-        # Filter the data to only include rows for this route
         data = filtered_data[filtered_data['route'] == route]
         
         # Check if the data DataFrame is empty
@@ -162,5 +161,12 @@ else:
 
     responsive_to_window_width()
     folium_static(m)
+
+st.markdown("""
+
+ <br>
+ <em>App made by Matti Pönkänen | FLOU ltd (2023). Licensed under CC0-1.0.</em>
+ 
+ """, unsafe_allow_html=True)
 
 
