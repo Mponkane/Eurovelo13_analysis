@@ -37,7 +37,7 @@ Verkkosovelluksella pystyt tarkastelemaan ja vertailemaan  Eurovelo 13 -reittise
             <div style="margin-left: 40px;">Viimeisestä osiosta löydät analyysissä käytetyt datalähteet. </b></div></div>
 
 <br>
-<h4 style="margin-left: -20px;">👈 Sivupalkista löydät tuotetun analyysin eri osa-alueet.</h4>
+<h4 style="margin-left: -10px;">👈 Sivupalkista löydät tuotetun analyysin eri osa-alueet.</h4>
 
 
 <br><br>

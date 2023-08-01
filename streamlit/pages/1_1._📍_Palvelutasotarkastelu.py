@@ -19,9 +19,9 @@ st.markdown("""
    <h2 style="margin: 0;">Eurovelo 13 -reitin palvelutaso</h2>
    <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
  </div>   
-Tässä osiossa voit tarkastella Eurovelo 13 -reitin varrelle sijoittuvia palveluita. Reittiä voi tarkastella joko kokonaisuutena tai suunniteltujen 
-päiväsegmenttien mukaisesti. Valitse ensin valikosta tarkasteltavat palvelut, virkistyskohteet ja maisemalliset arvot, jonka jälkeen pystyt
-tarkastelemaan miten ne jakaantuvat eri päiväsegmenteittäin. Päiväsegmenttien palvelutasoa on myös mahdollista verrata koko reitin keskiarvoon, 
+Tässä osiossa voit tarkastella Eurovelo 13 -reitin varrelle sijoittuvia palveluita, virkstyskohteita sekä maisema-arvoja. Reittiä voi tarkastella joko kokonaisuutena tai suunniteltujen 
+päiväetappien mukaisesti. Valitse ensin valikosta tarkasteltavat palvelut, virkistyskohteet ja maisemalliset arvot, jonka jälkeen pystyt
+tarkastelemaan miten ne jakaantuvat reitillä tai etapeilla. Päiväetappien palvelutasoa on myös mahdollista verrata koko reitin keskiarvoon, 
 jolloin voidaan vertailla reittiosuuksien laatua palveluiden näkökulmasta. Menetelmäkuvauksen löydät alapuolelta.
 <br><br>
  """, unsafe_allow_html=True)
@@ -62,7 +62,7 @@ else:
     # Add an "Koko reitti" option to the segments list so that data can be looked at nationKoko reittiy
     segments = np.insert(segments, 0, 'Koko reitti')
     # Create a selectbox for different segments
-    selected_segment = st.selectbox('Valitse reittisegmentti:', segments)
+    selected_segment = st.selectbox('Valitse päiväetappi:', segments)
 #-------------------------------------------------------------
 
     # Reprojecting for length properties
@@ -129,7 +129,7 @@ else:
 
         # Update the layout of the chart
         fig1.update_layout(
-            title=f'Palvelut segmentillä: {selected_segment} ({segment_length:.0f} km)',
+            title=f'Palvelut etapilla: {selected_segment} ({segment_length:.0f} km)',
             title_font_size=24,
             xaxis_title=None,
             yaxis_title=None,
@@ -139,17 +139,17 @@ else:
 
     #function for creating a comparison chart
     def create_comparison_chart(selected_segment, filtered_data, avg_opportunities, avg_opportunities_segment):
-        # Get the selected Palvelun tyyppis from the filtered_data DataFrame
+        # Get the selected Palvelun tyyppit from the filtered_data DataFrame
         selected_opportunity_types = filtered_data['type'].unique()
 
         # Reindex the avg_opportunities and avg_opportunities_segment Series objects
         avg_opportunities = avg_opportunities.reindex(selected_opportunity_types, fill_value=0)
         avg_opportunities_segment = avg_opportunities_segment.reindex(selected_opportunity_types, fill_value=0)
 
-        # Create a DataFrame with columns for Palvelun tyyppi, segment, and average opportunities per kilometer
+        # Create a DataFrame with columns for Palvelun tyyppi, etappi, and average opportunities per kilometer
         data = pd.DataFrame({
             'Palvelun tyyppi': np.tile(selected_opportunity_types, 2),
-            'Segmentti': np.repeat([selected_segment, 'Koko reitti'], len(selected_opportunity_types)),
+            'Etappi': np.repeat([selected_segment, 'Koko reitti'], len(selected_opportunity_types)),
             'Palveluiden määrä kilometriä kohden': np.concatenate([avg_opportunities_segment.values, avg_opportunities.values])
         })
 
@@ -158,7 +158,7 @@ else:
             data,
             x='Palvelun tyyppi',
             y='Palveluiden määrä kilometriä kohden',
-            color='Segmentti',
+            color='Etappi',
             barmode='group',
             color_discrete_map={selected_segment: '#fa9b28', 'Koko reitti': '#003346'}
         )
@@ -183,7 +183,7 @@ else:
     if filtered_data.empty:
         col1, col2 = st.columns([1, 1])
         with col1:
-            st.warning("Ei palveluita segmentillä, valitse toinen yhteysväli")
+            st.warning("Ei palveluita etapilla, valitse toinen yhteysväli")
     else:  
         # Calculate the centroid of the selected segment geometry so that map gets to the location of the points
         centroid = filtered_data.geometry.unary_union.centroid
@@ -262,6 +262,21 @@ else:
         else:
             with col2:
                 folium_static(m)
+        if selected_segment == 'Koko reitti':
+            # Adding a table to compare the different segments
+            filtered_data['segmentti'] = filtered_data['segmentti'].str.split(', ')
+            filtered_data = filtered_data.explode('segmentti')
+            segment_counts = filtered_data.groupby('segmentti').size().reset_index(name='Palveluiden ja maisema-alueiden lukumäärä reitillä')
+            segment_counts = segment_counts[~segment_counts['segmentti'].isin(landscape_types)]
+            segment_counts = segment_counts.rename(columns={'segmentti': 'Päiväetappi'})
+            segment_lengths = eurovelo_tm35fin.groupby('name').geometry.apply(lambda x: x.length.sum()) / 1000
+            segment_counts['Etapin pituus (km)'] = segment_counts['Päiväetappi'].map(segment_lengths)
+            st.dataframe(segment_counts, width = 1500)
+
+
+
+
+
 
 st.markdown("""
 
@@ -269,10 +284,9 @@ st.markdown("""
 #### Menetelmäkuvaus
 
 Analyysin paikkatietoaineistot on kerätty erilaisista tietolähteistä, jotka löydät verkkosivun kohdasta <b>4. Datalähteet</b>. 
-Palvelutasoanalyysi on tuotettu, jakamalla Eurovelon GPX jälki 31 päiväsegmenttiin. Päiväsegmentit kuvaavat reittiosuuksia, miten reittiä suositellaan pyöräiltävän.
-Analyysissä, jokaiselle päiväsegmentille on ajettu 10 km puskurivyöhyke, joiden sisälle jäävät palvelut on kiinnitetty arvottamaan eri päiväsegmenttejä. 
+Palvelutasoanalyysi on tuotettu, jakamalla Eurovelon GPX-jälki 31 päiväetappiin. Analyysissä, jokaiselle päiväetapille on ajettu 10 km puskurivyöhyke, joiden sisälle jäävät palvelut on kiinnitetty arvottamaan eri päiväetappeja. 
 Data on alustettu erilaisilla paikkatieto-ohjelmistoilla, jonka jälkeen se on viety Pythonin Streamlit kirjaston avulla verkkoon, interaktiiviseen muotoon. 
-<br><br>Scripti jolla tämä sivu on tuotettu näet githubista: https://github.com/Mponkane/Eurovelo13_analysis/blob/main/streamlit/pages/1_📍_Palvelut_ja_virkistyskohteet.py         
+<br><br>Scriptin jolla sivu on tuotettu, löydät githubista: https://github.com/Mponkane/Eurovelo13_analysis/blob/main/streamlit/pages/1_📍_Palvelut_ja_virkistyskohteet.py         
 
 <br>
 

@@ -14,10 +14,10 @@ st.markdown("""
    <h2 style="margin: 0;">Eurovelo 13 – Painotettu matkailuindeksi</h2>
    <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
  </div>   
-Painotetun matkailuindeksin avulla voidaan pisteyttää Eurovelo 13 -reitin päiväsegmenttejä
+Painotetun matkailuindeksin avulla voidaan pisteyttää Eurovelo 13 -reitin päiväetappeja
 asettamalla tärkeyden mukaan erilaisia painotuksia palveluille, virkistyskohteille tai maisema-arvoille. Esimerkiksi sen mukaan
-miten erilaiset pyörämatkailijat arvottaisivat niitä omalla matkallaan. Täten pyörämatkailureittien palvelutasoa voidaan verrata erilaisista näkökulmista.
-Matkailuindeksi saa arvoja väliltä 0-100 sen mukaan, kuinka hyvin painoarvojen mukaiset palvelut ilmenevät reittisegmenteillä. 
+millaisille erilaisille palveluille erilaiset pyörämatkailijat antaisivat painoarvoa omalla matkallaan. Täten pyörämatkailureittien palvelutasoa voidaan verrata erilaisista näkökulmista.
+Matkailuindeksi saa arvoja väliltä 0-100 sen mukaan, kuinka hyvin painoarvojen mukaiset palvelut ilmenevät reittietapeilla. 
 <br>
 <br><br>
  """, unsafe_allow_html=True)
@@ -138,15 +138,28 @@ if submitted or 'weights' not in st.session_state:
         responsive_to_window_width()
         folium_static(m)
 
+        # Sort segments by weighted sum score in descending order
+        segment_counts = segment_counts.sort_values(by='weighted', ascending=False)
+
+        # Reset index and rename columns
+        segment_counts = segment_counts.reset_index(drop=True)
+        segment_counts.index += 1
+        segment_counts = segment_counts.rename(columns={'index': 'Päiväetappi', 'weighted': 'Pisteet'})
+        
+
+        # Create a table to display the segments
+        st.dataframe(segment_counts[['Päiväetappi', 'Pisteet']], width = 1500)
+
+
 st.markdown("""
 
 
 #### Menetelmäkuvaus
 
-Indeksiä varten data on esikäsitelty siten, että jokaisen reittisegmentin varrelta löytyvien palvelujen, virkistyskohteiden ja maisema-arvojen lukumäärä
-on skaalattu 0-100 välille. Täten reittisegmentti, jonka varrelta löytyy esimerkiksi eniten ruokakauppoja, saa se ruokakauppojen arvoksi 100 pistettä. 
-Verkkosivujen käyttäjä voi interaktiivisesti asettaa näille arvoille painotuksia, jonka pohjalta lasketaan painotettu matkailuindeksi.
-<br><br>Scripti jolla tämä sivu on tuotettu näet githubista: https://github.com/Mponkane/Eurovelo13_analysis/blob/main/streamlit/pages/3_⚖️_Painotettu_palvelutaso.py        
+Indeksiä varten data on esikäsitelty skaalaamalla jokaisen reittietapin varrelta löytyvien palvelujen, virkistyskohteiden ja maisema-arvojen lukumäärä 0-100 välille. 
+Täten reittietappi, jonka varrelta löytyy esimerkiksi eniten ruokakauppoja, saa se ruokakauppojen arvoksi 100 pistettä. 
+Verkkosivujen käyttäjä voi interaktiivisesti asettaa näille arvoille painotuksia, jonka pohjalta lasketaan painotettu summa.
+<br><br>Scriptin jolla sivu on tuotettu, löydät githubista: https://github.com/Mponkane/Eurovelo13_analysis/blob/main/streamlit/pages/3_⚖️_Painotettu_palvelutaso.py        
 
 <br>
 

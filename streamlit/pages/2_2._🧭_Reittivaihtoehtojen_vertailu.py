@@ -21,7 +21,7 @@ Osana harvaan asuttujen seutujen matkailuhanketta, tarkasteltiin myös Eurovelo 
 Nykyinen Eurovelo 13 -reitin linjaus kulkee Sallasta Savukoskelle, jonka kautta se suuntautuu Pyhälle. Osana tätä hanketta, tarkasteltiin myös vaihtoehtoista
 reittiä Kemijärven kautta. Reittivaihtoehdot ovat pituudeltaan samaa luokkaa (150 km), mutta uusi reittilinjaus on palvelutarjonnaltaan runsaampi. 
 Alla olevasta laatikosta pystyt rajaamaan erilaiset palvelut, jotka piirretään näkyviin kuvaajaan sekä karttaan. 
-Kartan harmaat pisteet ovat palveluita, jotka sijoittuvat molempien reittien segmenteille.
+Kartan harmaat pisteet ovat palveluita, jotka sijoittuvat molempien reittien etapeille.
 <br><br>
  """, unsafe_allow_html=True)
 
