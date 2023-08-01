@@ -74,7 +74,7 @@ else:
 
     # Filter the data based on the selected segment or Koko reitti
     if selected_segment == 'Koko reitti':
-        filtered_data = merged_opportunities
+        filtered_data = merged_opportunities.copy()
         segment_length = eurovelo_tm35fin.geometry.length.sum() / 1000
         avg_opportunities_segment = avg_opportunities
         zoom_level = 5
