@@ -266,7 +266,7 @@ else:
             # Adding a table to compare the different segments
             filtered_data['segmentti'] = filtered_data['segmentti'].str.split(', ')
             filtered_data = filtered_data.explode('segmentti')
-            segment_counts = filtered_data.groupby('segmentti').size().reset_index(name='Palveluiden ja maisema-alueiden lukumäärä reitillä')
+            segment_counts = filtered_data.groupby('segmentti').size().reset_index(name='Valittujen palveluiden ja maisema-alueiden lukumäärä etapilla')
             segment_counts = segment_counts[~segment_counts['segmentti'].isin(landscape_types)]
             segment_counts = segment_counts.rename(columns={'segmentti': 'Päiväetappi'})
             segment_lengths = eurovelo_tm35fin.groupby('name').geometry.apply(lambda x: x.length.sum()) / 1000
