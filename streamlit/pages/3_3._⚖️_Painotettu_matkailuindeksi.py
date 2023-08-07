@@ -61,7 +61,7 @@ if 'weights' not in st.session_state:
     st.session_state.weights = {}
 
 # Create expander for number inputs
-with st.expander('Aseta painotukset'):
+with st.expander('Aseta painotukset (yhteensä 100 pistettä eri kriteereillä)'):
     # Create form for weight inputs
     with st.form(key='weights_form'):
         # Split number inputs into two columns within container

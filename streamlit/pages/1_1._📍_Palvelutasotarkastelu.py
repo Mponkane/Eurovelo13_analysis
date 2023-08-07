@@ -116,15 +116,15 @@ else:
     # Rename the opportunity column
     opportunities = opportunities.rename(columns={'type': 'Palvelun tyyppi'})
 
-    def opportunity_chart(opportunities):
+    def opportunity_chart(services):
         # Create a bar chart
         fig1 = px.bar(
-            opportunities,
+            services,
             x='Palvelun tyyppi',
             y='count',
             color='Palvelun tyyppi',
             text='count',
-            color_discrete_sequence=opportunities['color'].unique()
+            color_discrete_sequence=services['color'].unique()
         )
 
         # Update the layout of the chart
@@ -165,7 +165,7 @@ else:
 
         # Update the layout of the chart
         fig2.update_layout(
-            title=f'Palveluiden määrä kilometriä kohden',
+            title='Palveluiden määrä kilometriä kohden',
             title_font_size=24,
             xaxis_title=None,
             yaxis_title=None,
@@ -197,7 +197,7 @@ else:
         style_route(m, selected_segment, eurovelo)
 
         # Function for adding polygons
-        def add_polygon_layer(gdf, color):
+        def add_polygon_layer(gdf, _):
             # Add GeoJson polygons to the map
             for _, row in gdf.iterrows():
                 folium.GeoJson(
