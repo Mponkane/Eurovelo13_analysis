@@ -14,8 +14,15 @@ st.markdown("""
    <img style="margin-left: auto;" src="https://raw.githubusercontent.com/Mponkane/Eurovelo13_analysis/main/streamlit/data/welcome_cyclist.png" width="150" height="150">
  </div>
             
+Erilaisten pyörämatkailureittien varrelle sijoittuvat palvelut sekä virkistyskohteet ovat keskeisessä roolissa
+tuottamassa positiivista ja turvallista pyörämatkailukokemusta. Erityisesti harvaan asuttujen seutujen läpi kulkevat pitkänmatkan pyöräilyreitit voivat sisältää pitkiäkin reittiosuuksia, missä palveluita ei ole lainkaan saatavilla. 
+Toisaalta ongelmana on myös se, että tieto saatavilla olevista palveluista tai virkistyspaikoista ei myöskään ole aina helposti saatavilla, ajantasaista tai vertailtavassa muodossa. Täten pyöräreittien palvelutason laadun suunnittelua on vaikeaa systematisoida. 
+Reittiosuuksia olisi siis hyvä saada vertailtavaan muotoon palveluiden ja virkistyskohteiden näkökulmasta, jotta voitaisiin paikantaa ne osuudet, mihin on syytä kohdistaa pyörämatkailun palvelutasoa nostattavia toimenpiteitä. 
+Tällä hetkellä tietoa pyörämatkailureittien varrella olevista palveluista ja virkistyskohteista kerätään hyvin manuaalisesti. Koska yksittäisten palveluiden ja virkistysalueiden manuaalinen kartoittaminen on todella työlästä, on tarpeen tarkastella keinoja, miten olemassa
+olevia paikkatietokantoja voitaisiin hyödyntää tehokkaammin osana pyörämatkailun suunnittelua ja miten tiedonhankintaa voitaisiin myös automatisoida.
+<br><br>
 Tämä verkkosovellus ja paikkatietoanalyysi on tuotettu osaksi harvaan asuttujen alueiden matkailuhanketta. Hankkeen on tarkoitus pilotoida erilaisia paikkatietomenetelmiä pyörämatkailun suunnitteluun. 
-Verkkosovelluksella pystyt tarkastelemaan ja vertailemaan  Eurovelo 13 -reittisegmenttien palvelutasoa.
+Verkkosovelluksella pystyt tarkastelemaan ja vertailemaan  Eurovelo 13 -reittisegmenttien palvelutasoa. 
 
                       
 #### Verkkosovellus on jaettu neljään osaan:

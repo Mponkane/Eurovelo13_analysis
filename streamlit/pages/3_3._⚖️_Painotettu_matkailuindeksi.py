@@ -17,8 +17,9 @@ st.markdown("""
 Painotetun matkailuindeksin avulla voidaan pisteyttää Eurovelo 13 -reitin päiväetappeja
 asettamalla tärkeyden mukaan erilaisia painotuksia palveluille, virkistyskohteille tai maisema-arvoille. Esimerkiksi sen mukaan
 millaisille erilaisille palveluille erilaiset pyörämatkailijat antaisivat painoarvoa omalla matkallaan. Täten pyörämatkailureittien palvelutasoa voidaan verrata erilaisista näkökulmista.
-Matkailuindeksi saa arvoja väliltä 0-100 sen mukaan, kuinka hyvin painoarvojen mukaiset palvelut ilmenevät reittietapeilla. 
-<br>
+<b>Aloita sovelluksen käyttö asettamalla alla olevan pudotusvalikon sisältämille palveluille, virkistyskohteille sekä maisema-arvoille painotus. Käytettävänäsi on 100 pistettä, jonka voit 
+jakaa eri kohteille niiden tärkeyden mukaisesti.</b> Painotuksia käytetään matkailuindeksin laskemiseksi. Indeksi saa arvoja väliltä 0-100 sen mukaan, kuinka hyvin painoarvojen mukaiset 
+palvelut ilmenevät reittietapeilla.
 <br><br>
  """, unsafe_allow_html=True)
 
