@@ -52,7 +52,7 @@ def filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eu
     selected_types = st.multiselect('Valitse palvelut ja virkistyskohteet:', opportunity_types, default=opportunity_types)
 
     if not selected_types:
-        st.warning('Valitse ainakin yksi palvelu tai virkistyskohde')
+        pass
 
     else:
         # Tämä saatttaa olla väärin
@@ -190,10 +190,15 @@ def add_description():
 def main():
     set_page()
     combined_data, opportunity_types, ve0, ve1, eurovelo = read_data()
-    m, fig = filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eurovelo)
-    st.plotly_chart(fig, use_container_width=True)
-    folium_static(m)
+    result = filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eurovelo)
+    if result is None:
+        st.warning('Valitse ainakin yksi palvelu tai virkistyskohde')
+    else:
+        m, fig = result
+        st.plotly_chart(fig, use_container_width=True)
+        folium_static(m)
     add_description()
+
 
 if __name__ == "__main__":
     main()
