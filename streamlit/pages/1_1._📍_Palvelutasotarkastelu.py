@@ -145,7 +145,7 @@ def opportunity_chart(opportunities, selected_segment, segment_length):
 
     # Update the layout of the chart
     fig1.update_layout(
-        title=f'Palvelut etapilla: {selected_segment} ({segment_length:.0f} km)',
+        title=f'Palvelut etapilla:<br>{selected_segment} ({segment_length:.0f} km)',
         title_font_size=24,
         xaxis_title=None,
         yaxis_title=None,
@@ -185,6 +185,13 @@ def create_comparison_chart(selected_segment, filtered_data, avg_opportunities, 
         title_font_size=24,
         xaxis_title=None,
         yaxis_title=None,
+        legend=dict(
+            orientation="h",
+            x=0.5,
+            y=-0.7,
+            xanchor="center",
+            yanchor="top"
+        )
     )
     
     return fig2

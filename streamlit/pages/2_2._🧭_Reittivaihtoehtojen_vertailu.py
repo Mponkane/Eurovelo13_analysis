@@ -71,7 +71,7 @@ def filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eu
         )
 
         fig.update_layout(
-            title=f'Palveluiden vertailu nykyisellä ja vaihtoehtoisella reittilinjauksella',
+            title=f'Palveluiden vertailu nykyisellä ja <br>vaihtoehtoisella reittilinjauksella',
             title_font_size=24,
             xaxis_title=None,
             yaxis_title=None,
@@ -81,7 +81,12 @@ def filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eu
                 font=dict(
                     size=14
                 ),
-                title_font_size=16
+                title_font_size=16,
+                orientation="h",
+                x=0.5,
+                y=-0.3,
+                xanchor="center",
+                yanchor="top"
             )
         )
 
