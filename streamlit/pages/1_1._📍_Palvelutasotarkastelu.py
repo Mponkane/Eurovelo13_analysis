@@ -55,7 +55,8 @@ def filter_data_and_create_charts(merged_opportunities, eurovelo, buffer, buffer
         avg_opportunities = merged_opportunities.groupby('type').size() / (eurovelo_tm35fin.geometry.length.sum() / 1000)
         fig1, fig2, m, filtered_data = create_figures(selected_segment, eurovelo, avg_opportunities, merged_opportunities, landscape_types, selected_landscape_types,
                         selected_types, opportunity_types, buffer, buffer_merged)
-        create_page_elements(selected_segment, filtered_data, landscape_types, eurovelo, fig1, fig2, m)
+        if m is not None:
+            create_page_elements(selected_segment, filtered_data, landscape_types, eurovelo, fig1, fig2, m)
         
 
 def set_segments(merged_opportunities, eurovelo):
@@ -145,7 +146,7 @@ def opportunity_chart(opportunities, selected_segment, segment_length):
 
     # Update the layout of the chart
     fig1.update_layout(
-        title=f'Palvelut etapilla: {selected_segment} ({segment_length:.0f} km)',
+        title=f'Palvelut etapilla:<br>{selected_segment} ({segment_length:.0f} km)',
         title_font_size=24,
         xaxis_title=None,
         yaxis_title=None,
@@ -181,7 +182,7 @@ def create_comparison_chart(selected_segment, filtered_data, avg_opportunities, 
 
     # Update the layout of the chart
     fig2.update_layout(
-        title='Palveluiden määrä kilometriä kohden',
+        title='Palveluiden määrä <br>kilometriä kohden',
         title_font_size=24,
         xaxis_title=None,
         yaxis_title=None,
@@ -204,6 +205,7 @@ def create_map(filtered_data, zoom_level, show_buffer, selected_segment, buffer,
             col1, _ = st.columns([1, 1])
             with col1:
                 st.warning("Ei palveluita etapilla, valitse toinen yhteysväli")
+            return None
         
         else:  
             # Calculate the centroid of the selected segment geometry so that map gets to the location of the points
