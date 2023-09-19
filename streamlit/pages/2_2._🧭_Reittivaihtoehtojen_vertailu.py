@@ -72,6 +72,7 @@ def filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eu
 
         fig.update_layout(
             title=f'Palveluiden vertailu nykyisellä ja <br>vaihtoehtoisella reittilinjauksella',
+            dragmode=False,
             title_font_size=24,
             xaxis_title=None,
             yaxis_title=None,
@@ -200,7 +201,8 @@ def main():
         st.warning('Valitse ainakin yksi palvelu tai virkistyskohde')
     else:
         m, fig = result
-        st.plotly_chart(fig, use_container_width=True)
+        config = {'displayModeBar': False}
+        st.plotly_chart(fig, use_container_width=True, config=config)
         folium_static(m)
     add_description()
 

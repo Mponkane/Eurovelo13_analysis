@@ -146,6 +146,7 @@ def opportunity_chart(opportunities, selected_segment, segment_length):
 
     # Update the layout of the chart
     fig1.update_layout(
+        dragmode=False,
         title=f'Palvelut etapilla:<br>{selected_segment} ({segment_length:.0f} km)',
         title_font_size=24,
         xaxis_title=None,
@@ -182,6 +183,7 @@ def create_comparison_chart(selected_segment, filtered_data, avg_opportunities, 
 
     # Update the layout of the chart
     fig2.update_layout(
+        dragmode=False,
         title='Palveluiden määrä <br>kilometriä kohden',
         title_font_size=24,
         xaxis_title=None,
@@ -280,10 +282,11 @@ def add_point_layer(gdf, color, m):
 
 def create_page_elements(selected_segment, filtered_data, landscape_types, eurovelo, fig1, fig2, m):
         col1, col2 = st.columns([1, 1])
-        col1.plotly_chart(fig1, use_container_width=True)
+        config = {'displayModeBar': False}
+        col1.plotly_chart(fig1, use_container_width=True, config=config)
         responsive_to_window_width()
         if fig2 is not None:
-            col2.plotly_chart(fig2, use_container_width=True)
+            col2.plotly_chart(fig2, use_container_width=True, config=config)
             folium_static(m)
         else:
             with col2:
