@@ -38,80 +38,66 @@ def load_data():
 def set_weights(palvelut, eurovelo):
 
     # ------Setting data for weights input-------
-    # Preprocess data to split rows where 'segmentti' contains multiple segments
     palvelut = palvelut.assign(segmentti=palvelut['segmentti'].str.split(', ')).explode('segmentti')
 
-    # Create empty DataFrame based on eurovelo data
     segments = eurovelo['name'].unique()
     segment_counts = pd.DataFrame(index=segments)
 
-    # Count number of opportunities for each segment and opportunity type
     for opportunity_type in palvelut['type'].unique():
         counts = palvelut[palvelut['type'] == opportunity_type].groupby('segmentti').size()
         segment_counts[opportunity_type] = counts
 
-    # Fill missing values with 0
     segment_counts = segment_counts.fillna(0)
-
-    # Normalize counts to be between 0 and 100
     segment_counts = (segment_counts - segment_counts.min()) / (segment_counts.max() - segment_counts.min()) * 100
 
-    # limit for points to set
     total_points = 100
 
-    # Initialize weights in session_state
     if 'weights' not in st.session_state:
         st.session_state.weights = {}
 
-    # Create expander for number inputs
+    temporary_weights = {}  # Store current form values
+
     with st.expander('Aseta painotukset (yhteensä 100 pistettä)'):
-        # Create form for weight inputs
         with st.form(key='weights_form'):
-            # Split number inputs into two columns within container
             col1, col2 = st.columns(2)
 
-            # Split opportunities into two lists
             opportunities = list(palvelut['type'].unique())
             half = len(opportunities) // 2
             opportunities_col1 = opportunities[:half]
             opportunities_col2 = opportunities[half:]
-            
-            # Create number inputs for first column
+
             with col1:
                 for opportunity_type in opportunities_col1:
                     weight = st.number_input(opportunity_type, min_value=0, max_value=total_points, value=st.session_state.weights.get(opportunity_type, 0))
-                    st.session_state.weights[opportunity_type] = weight
-            
-            # Create number inputs for second column
+                    temporary_weights[opportunity_type] = weight
+
             with col2:
                 for opportunity_type in opportunities_col2:
                     weight = st.number_input(opportunity_type, min_value=0, max_value=total_points, value=st.session_state.weights.get(opportunity_type, 0))
-                    st.session_state.weights[opportunity_type] = weight
-            
-            # Create submit button
+                    temporary_weights[opportunity_type] = weight
+
             submitted = st.form_submit_button('Valitse asetetut painotukset')
-            
-            # Create clear button using form_submit_button function with label argument set to 'Clear'
+
             if st.form_submit_button(label='Tyhjennä painotukset'):
-                # Reset weights in session_state
                 st.session_state.weights = {}
 
-    # Check if form was submitted or cleared
+    if submitted:
+        st.session_state.weights = temporary_weights
+
     if submitted or 'weights' not in st.session_state:
-        # Calculate remaining points
         remaining_points = total_points - sum(st.session_state.weights.values())
         weights = exception_handling(remaining_points)
         if weights is not None:
             segment_counts['weighted'] = 0
             for opportunity_type in palvelut['type'].unique():
                 segment_counts['weighted'] += st.session_state.weights[opportunity_type] * (segment_counts[opportunity_type] / 100)
-            # Reset index of segment_counts DataFrame
             segment_counts = segment_counts.reset_index()
             return eurovelo, segment_counts
         else:
             return None, None
     else:
         return None, None
+
     
 def exception_handling(remaining_points):        
     # Check if remaining points is negative or positive
