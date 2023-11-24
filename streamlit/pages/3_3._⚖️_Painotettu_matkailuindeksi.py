@@ -116,7 +116,7 @@ def exception_handling(remaining_points):
 def create_map(eurovelo, segment_counts):
     initial_coords = [65.5, 26.2]
     zoom_level = 5
-    m = folium.Map(location=initial_coords, zoom_start=zoom_level, tiles='cartodbpositron')
+    m = folium.Map(location=initial_coords, zoom_start=zoom_level, tiles='openstreetmap')
 
     # Merge segment_counts with eurovelo on segment name
     eurovelo = eurovelo.merge(segment_counts, left_on='name', right_on='index')

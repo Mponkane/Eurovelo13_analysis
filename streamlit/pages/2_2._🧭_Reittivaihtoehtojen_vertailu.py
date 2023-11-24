@@ -98,7 +98,7 @@ def filter_data_and_create_charts(combined_data, opportunity_types, ve0, ve1, eu
 def create_map(filtered_data, combined_data, selected_types, eurovelo, ve0, ve1):
         centroid = filtered_data.geometry.unary_union.centroid
         zoom_level = 8
-        m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles='cartodbpositron')
+        m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles='openstreetmap')
 
         # Create a new column 'in_both_routes' that is True if the point appears in both routes and False otherwise
         combined_data['in_both_routes'] = combined_data.duplicated(subset=['geometry'], keep=False)

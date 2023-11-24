@@ -214,7 +214,7 @@ def create_map(filtered_data, zoom_level, show_buffer, selected_segment, buffer,
             centroid = filtered_data.geometry.unary_union.centroid
 
             # Create a new Folium map centered on the centroid of the selected segment's geometry
-            m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles = 'cartodbpositron')
+            m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles = 'openstreetmap')
 
             # Add the buffer and route to the map
             if show_buffer:
